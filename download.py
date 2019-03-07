@@ -117,7 +117,22 @@ def maybe_download_and_extract(url, download_dir, pwd=None):
 
         if file_path.endswith(".zip"):
             # Unpack the zip-file.
-            zipfile.ZipFile(file=file_path, mode="r").extractall(download_dir, pwd=pwd)
+            # zipfile.ZipFile(file=file_path, mode="r").extractall(download_dir, pwd=pwd)
+            zf = zipfile.ZipFile(file=file_path, mode="r")
+            uncompressed_file_size = sum((file.file_size for file in zf.infolist()))
+            extracted_file_size = 0
+            for file in zf.infolist():
+                extracted_size += file.file_size
+                zf.extract(file, pwd=pwd)
+                # Percentage completion.
+                pct_complete = extracted_size / uncompressed_file_size
+                # Limit it because rounding errors may cause it to exceed 100%.
+                pct_complete = min(1.0, pct_complete)
+                # Status-message. Note the \r which means the line should overwrite itself.
+                msg = "\r- Extracting progress: {0:.1%}".format(pct_complete)
+                # Print it.
+                sys.stdout.write(msg)
+                sys.stdout.flush()
         elif file_path.endswith((".tar.gz", ".tgz")):
             # Unpack the tar-ball.
             tarfile.open(name=file_path, mode="r:gz").extractall(download_dir, pwd=pwd)
