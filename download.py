@@ -77,7 +77,7 @@ def download(base_url, filename, download_dir):
         print(" Done!")
 
 
-def maybe_download_and_extract(url, download_dir):
+def maybe_download_and_extract(url, download_dir, pwd=None):
     """
     Download and extract the data if it doesn't already exist.
     Assumes the url is a tar-ball file.
@@ -117,10 +117,10 @@ def maybe_download_and_extract(url, download_dir):
 
         if file_path.endswith(".zip"):
             # Unpack the zip-file.
-            zipfile.ZipFile(file=file_path, mode="r").extractall(download_dir)
+            zipfile.ZipFile(file=file_path, mode="r").extractall(download_dir, pwd=pwd)
         elif file_path.endswith((".tar.gz", ".tgz")):
             # Unpack the tar-ball.
-            tarfile.open(name=file_path, mode="r:gz").extractall(download_dir)
+            tarfile.open(name=file_path, mode="r:gz").extractall(download_dir, pwd=pwd)
 
         print("Done.")
     else:

@@ -11,5 +11,5 @@ test_data_url = "http://www.iapr-tc11.org/dataset/ICDAR_SignatureVerification/Si
 
 
 def maybe_download_and_extract():
-    download.maybe_download_and_extract(url=train_data_url, download_dir=data_dir)
-    download.maybe_download_and_extract(url=test_data_url, download_dir=data_dir)
+    download.maybe_download_and_extract(url=train_data_url, download_dir=data_dir, pwd=b'I hereby accept the SigComp 2011 disclaimer.')
+    download.maybe_download_and_extract(url=test_data_url, download_dir=data_dir, pwd=b'I hereby accept the SigComp 2011 disclaimer.')
