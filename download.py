@@ -122,10 +122,10 @@ def maybe_download_and_extract(url, download_dir, pwd=None):
             uncompressed_file_size = sum((file.file_size for file in zf.infolist()))
             extracted_file_size = 0
             for file in zf.infolist():
-                extracted_size += file.file_size
+                extracted_file_size += file.file_size
                 zf.extract(file, pwd=pwd)
                 # Percentage completion.
-                pct_complete = extracted_size / uncompressed_file_size
+                pct_complete = extracted_file_size / uncompressed_file_size
                 # Limit it because rounding errors may cause it to exceed 100%.
                 pct_complete = min(1.0, pct_complete)
                 # Status-message. Note the \r which means the line should overwrite itself.
