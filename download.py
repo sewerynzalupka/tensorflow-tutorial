@@ -136,7 +136,8 @@ def maybe_download_and_extract(url, download_dir, pwd=None):
         elif file_path.endswith((".tar.gz", ".tgz")):
             # Unpack the tar-ball.
             tarfile.open(name=file_path, mode="r:gz").extractall(download_dir, pwd=pwd)
-
+        
+        print()
         print("Done.")
     else:
         print("Data has apparently already been downloaded and unpacked.")

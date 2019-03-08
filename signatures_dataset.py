@@ -4,11 +4,11 @@ import shutil
 from cache import cache
 import re
 
-forgery_filename_pattern = r"(?P<forger>\d{4})(?P<signer>\d{3})_(?P<i>\d{2}){0}$"
-genuine_filename_pattern = r"(?P<signer>\d{3})_(?P<i>\d{2}){0}$"
+forgery_filename_pattern = r"(?P<forger>\d{{4}})(?P<signer>\d{{3}})_(?P<i>\d{{2}})({exts})$"
+genuine_filename_pattern = r"(?P<signer>\d{{3}})_(?P<i>\d{{2}})({exts})$"
 
 class SignaturesDataset:
-    def __init__(self, train_dir, test_dir, exts='.png'):
+    def __init__(self, train_dir, test_dir, exts=['.png']):
         """
         Create a data-set consisting of the filenames in the given directory
         and sub-dirs that match the given filename-extensions.
@@ -41,20 +41,29 @@ class SignaturesDataset:
         # Train set
         signatures = {}
         for filename in self._get_filenames(self.train_dir):
-            genuine_match = re.match(genuine_filename_pattern.format(self.exts), filename)
-            if genuine_match:
-                signer = genuine_match.group('signer')
-                if signer not in signatures:
-                    signatures[signer] = { 'genuine': [], 'forgeries': [] }
-                signatures[signer]['genuine'].add(filename)
-            forgery_match = re.match(forgery_filename_pattern.format(self.exts), filename)
+            forgery_match = re.search(forgery_filename_pattern.format(exts='|'.join(self.exts)), filename.lower())
             if forgery_match:
                 forged_signer = forgery_match.group('signer')
                 if forged_signer not in signatures:
                     signatures[forged_signer] = { 'genuine': [], 'forgeries': [] }
-                signatures[forged_signer]['forgeries'].add(filename)
+                signatures[forged_signer]['forgeries'].append(filename)
+                continue
+            genuine_match = re.search(genuine_filename_pattern.format(exts='|'.join(self.exts)), filename.lower())
+            if genuine_match:
+                signer = genuine_match.group('signer')
+                if signer not in signatures:
+                    signatures[signer] = { 'genuine': [], 'forgeries': [] }
+                signatures[signer]['genuine'].append(filename)
         
-        self.train_signatures_dict = signatures
+        authors = list(signatures.keys())
+        
+        self.signatures_dict = signatures
+        
+        self.genuine_classes = ['{author}_genuine'.format(author=author) for author in authors]
+        self.forged_classes = ['{author}_forged'.format(author=author) for author in authors]
+        self.class_names = self.genuine_classes + self.forged_classes
+        
+        self.num_classes = len(self.class_names)
                 
     def _get_filenames(self, dir):
         """
